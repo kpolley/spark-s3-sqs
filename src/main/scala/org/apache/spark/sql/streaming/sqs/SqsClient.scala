@@ -138,13 +138,6 @@ class SqsClient(sourceOptions: SqsSourceOptions,
         val messageReceiptHandle = message.getReceiptHandle
         var messageJson = parse(message.getBody).extract[JValue]
 
-        // If the message is coming from SNS, we need to extract and parse
-        // the actual s3 metadata stored as a JSON string in 'Message'
-        val messageType = (messageJson \ "Type").extract[String]
-        if (messageType.contains("Notification")) {
-          messageJson = parse((messageJson \ "Message").extract[String])
-        }
-
         val bucketName = (
           messageJson \ "Records" \ "s3" \ "bucket" \ "name").extract[Array[String]].head
         val eventName = (messageJson \ "Records" \ "eventName").extract[Array[String]].head
